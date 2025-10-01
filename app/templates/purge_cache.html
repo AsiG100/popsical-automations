@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Cache Purge</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Cloudflare Cache Purge</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class=flashes>
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('purge_cache') }}" method="post">
+        <label for="url">URL to purge:</label>
+        <input type="url" id="url" name="url" size="50" required>
+        <button type="submit">Purge Cache</button>
+    </form>
+    <a href="{{ url_for('index') }}">Back to Hub</a>
+</body>
+</html>

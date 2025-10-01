@@ -1,0 +1,13 @@
+# Environment variables
+.env
+
+# Log files
+flask_app.log
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE files
+.idea/
+.vscode/
