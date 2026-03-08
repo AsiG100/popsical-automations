@@ -1,0 +1,113 @@
+{% extends "hub/base.html" %}
+{% load static %}
+
+{% block title %}Popsical Automations Hub{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+    <!-- Header -->
+    <header class="hub-header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-logo">🎵</div>
+                <div class="brand-text">
+                    <h1 class="brand-title">Popsical Automations</h1>
+                    <p class="brand-subtitle">Internal tools &amp; workflows</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="hub-main">
+
+        <!-- Search -->
+        <div class="search-wrapper">
+            <div class="search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="search-input" class="search-input" placeholder="Search automations…"
+                    autocomplete="off" spellcheck="false">
+                <span class="search-clear" id="search-clear" aria-label="Clear search">✕</span>
+            </div>
+            <p class="search-hint" id="search-hint">
+                <span id="result-count">{{ automations|length }}</span> automation{{ automations|length|pluralize }}
+                available
+            </p>
+        </div>
+
+        <!-- Cards grid -->
+        <div class="cards-grid" id="cards-grid">
+            {% for automation in automations %}
+            <div class="card" data-title="{{ automation.title|lower }}"
+                data-description="{{ automation.description|lower }}" data-tags="{{ automation.tags|join:' ' }}">
+                <div class="card-icon">{{ automation.icon }}</div>
+                <div class="card-body">
+                    <h2 class="card-title">{{ automation.title }}</h2>
+                    <p class="card-description">{{ automation.description }}</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-status card-status--{{ automation.status }}">
+                        {% if automation.status == "active" %}● Active{% else %}○ Coming soon{% endif %}
+                    </span>
+                    <a href="{{ automation.url }}" class="card-launch-btn">
+                        Launch <span class="btn-arrow">→</span>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="empty-state" style="display:none;">
+            <div class="empty-icon">🔎</div>
+            <p class="empty-title">No automations found</p>
+            <p class="empty-sub">Try a different search term</p>
+        </div>
+
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    const input = document.getElementById('search-input');
+    const clearBtn = document.getElementById('search-clear');
+    const cards = document.querySelectorAll('.card');
+    const emptyState = document.getElementById('empty-state');
+    const resultCount = document.getElementById('result-count');
+
+    function filterCards() {
+        const query = input.value.trim().toLowerCase();
+        let visible = 0;
+
+        cards.forEach(card => {
+            const searchable = [
+                card.dataset.title,
+                card.dataset.description,
+                card.dataset.tags,
+            ].join(' ');
+
+            const match = !query || searchable.includes(query);
+            card.style.display = match ? '' : 'none';
+            if (match) visible++;
+        });
+
+        resultCount.textContent = visible;
+        emptyState.style.display = visible === 0 ? 'flex' : 'none';
+        clearBtn.style.opacity = query ? '1' : '0';
+        clearBtn.style.pointerEvents = query ? 'auto' : 'none';
+    }
+
+    input.addEventListener('input', filterCards);
+
+    clearBtn.addEventListener('click', () => {
+        input.value = '';
+        input.focus();
+        filterCards();
+    });
+
+    // Init
+    filterCards();
+</script>
+{% endblock %}

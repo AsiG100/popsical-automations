@@ -1,0 +1,81 @@
+{% extends "automations/base_automation.html" %}
+
+{% block subtitle %}
+<p class="automation-subtitle">Sync Eventbrite attendees into your Mailchimp audience as subscribers.</p>
+{% endblock %}
+
+{% block automation_body %}
+
+{% if not results %}
+<!-- ── Input form ── -->
+<form method="post" class="automation-form" id="import-form">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="form-label" for="event_id">Eventbrite Event ID</label>
+        <p class="form-hint">Find it in your event URL: eventbrite.com/e/your-event-name-<strong>123456789</strong></p>
+        <input type="text" id="event_id" name="event_id" class="form-input" placeholder="e.g. 123456789"
+            value="{{ event_id|default:'' }}" required autocomplete="off">
+    </div>
+    <button type="submit" class="btn btn--primary" id="submit-btn">
+        <span class="btn-text">Sync to Mailchimp</span>
+        <span class="btn-spinner" style="display:none;">⏳ Syncing…</span>
+    </button>
+</form>
+
+{% else %}
+<!-- ── Results ── -->
+<div class="results-header">
+    <h2 class="results-title">
+        {% if event_name %}{{ event_name }}{% else %}Event {{ event_id }}{% endif %}
+    </h2>
+    <p class="results-subtitle">Sync complete</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span class="stat-value">{{ results.total }}</span>
+        <span class="stat-label">Total attendees</span>
+    </div>
+    <div class="stat-card stat-card--success">
+        <span class="stat-value">{{ results.success }}</span>
+        <span class="stat-label">Synced to Mailchimp</span>
+    </div>
+    <div class="stat-card stat-card--warn">
+        <span class="stat-value">{{ results.skipped }}</span>
+        <span class="stat-label">Skipped (no email)</span>
+    </div>
+    <div class="stat-card {% if results.errors %}stat-card--error{% endif %}">
+        <span class="stat-value">{{ results.errors|length }}</span>
+        <span class="stat-label">Errors</span>
+    </div>
+</div>
+
+{% if results.errors %}
+<details class="error-details">
+    <summary>View {{ results.errors|length }} error{{ results.errors|length|pluralize }}</summary>
+    <ul class="error-list">
+        {% for err in results.errors %}
+        <li><code>{{ err.email }}</code> — {{ err.detail }}</li>
+        {% endfor %}
+    </ul>
+</details>
+{% endif %}
+
+<div class="actions">
+    <a href="{% url 'eb_mc_import' %}" class="btn btn--secondary">Run again</a>
+    <a href="/" class="btn btn--ghost">Back to Hub</a>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.getElementById('import-form')?.addEventListener('submit', function () {
+        const btn = document.getElementById('submit-btn');
+        btn.querySelector('.btn-text').style.display = 'none';
+        btn.querySelector('.btn-spinner').style.display = 'inline';
+        btn.disabled = true;
+    });
+</script>
+{% endblock %}

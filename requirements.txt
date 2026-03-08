@@ -1,5 +1,7 @@
-Flask
-requests
+django>=4.2
 python-dotenv
-Flask-Dance
-loginpass
+requests
+gunicorn
+django-allauth
+PyJWT
+cryptography

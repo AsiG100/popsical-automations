@@ -1,0 +1,51 @@
+{% extends "hub/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'hub/style.css' %}">
+<link rel="stylesheet" href="{% static 'automations/automation.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+    <!-- Header -->
+    <header class="hub-header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-logo">🎵</div>
+                <div class="brand-text">
+                    <span class="brand-title">Popsical Automations</span>
+                    <span class="brand-subtitle">Internal tools &amp; workflows</span>
+                </div>
+            </div>
+            <a href="/" class="back-link">← Back to Hub</a>
+        </div>
+    </header>
+
+    <main class="automation-main">
+        <div class="automation-card">
+
+            <!-- Title -->
+            <div class="automation-header">
+                <span class="automation-icon">{{ icon }}</span>
+                <div>
+                    <h1 class="automation-title">{{ title }}</h1>
+                    {% block subtitle %}{% endblock %}
+                </div>
+            </div>
+
+            <!-- Error banner -->
+            {% if error %}
+            <div class="alert alert--error">
+                <span class="alert-icon">⚠️</span>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            {% block automation_body %}{% endblock %}
+
+        </div>
+    </main>
+</div>
+{% endblock %}
